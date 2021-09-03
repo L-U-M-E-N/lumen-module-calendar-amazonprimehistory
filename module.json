@@ -1,0 +1,16 @@
+{
+	"name": "calendar-amazon",
+	"fullName": "Amazon history calendar importer",
+	"author": "Elanis",
+	"version": "1.0.0",
+	"dependencies": {},
+	"desktop": {
+		"module": false,
+		"window": false
+	},
+	"mobile": {
+		"module": false,
+		"window": false
+	},
+	"server": true
+}
