@@ -16,7 +16,7 @@ module.exports = class AmazonCalendar {
 		});
 	}
 
-	static importAmazonPrimeVideoActivity() {
+	static async importAmazonPrimeVideoActivity() {
 		const file = fs.readFileSync(FILENAME).toString();
 
 		let firstLineSkipped = false;
@@ -47,12 +47,14 @@ module.exports = class AmazonCalendar {
 
 			//console.log(field);
 
-			const [query, values] = Database.buildInsertQuery('calendar', field);
+			if((await Database.execQuery('SELECT id FROM calendar WHERE id = $1', [id])).rows.length === 0) {
+				const [query, values] = Database.buildInsertQuery('calendar', field);
 
-			Database.execQuery(
-				query,
-				values
-			);
+				Database.execQuery(
+					query,
+					values
+				);
+			}
 		}
 
 		log('Saved Amazon Activity', 'info');
