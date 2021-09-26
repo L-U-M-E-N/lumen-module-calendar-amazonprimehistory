@@ -12,5 +12,6 @@
 		"module": false,
 		"window": false
 	},
-	"server": true
+	"server": true,
+	"config": {}
 }
