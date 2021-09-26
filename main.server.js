@@ -17,6 +17,11 @@ module.exports = class AmazonCalendar {
 	}
 
 	static async importAmazonPrimeVideoActivity() {
+		const minDate = (await Database.execQuery(
+				'SELECT MAX(start) as min FROM calendar WHERE title = $1', ['PrimeVideo']
+			)).rows[0].min;
+		minDate.setHours(minDate.getHours() - 6); // Safety margin
+
 		const file = fs.readFileSync(FILENAME).toString();
 
 		let firstLineSkipped = false;
@@ -34,6 +39,10 @@ module.exports = class AmazonCalendar {
 			const end = new Date(start);
 			end.setHours(end.getHours() + 1);
 
+			if(start.getTime() <= minDate.getTime()) {
+				continue;
+			}
+
 			const id = 'PrimeVideo-' + start;
 
 			const field = {
@@ -50,7 +59,7 @@ module.exports = class AmazonCalendar {
 			if((await Database.execQuery('SELECT id FROM calendar WHERE id = $1', [id])).rows.length === 0) {
 				const [query, values] = Database.buildInsertQuery('calendar', field);
 
-				Database.execQuery(
+				await Database.execQuery(
 					query,
 					values
 				);
