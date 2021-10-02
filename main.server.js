@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const FILENAME = path.join(process.cwd(), 'res/amazon/Digital.PrimeVideo.ViewingHistory.csv');
 
-module.exports = class AmazonCalendar {
+export default class AmazonCalendar {
 	static init() {
 		AmazonCalendar.importAmazonPrimeVideoActivity();
 
