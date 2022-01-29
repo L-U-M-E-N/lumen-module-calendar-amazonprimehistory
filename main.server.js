@@ -16,10 +16,44 @@ export default class AmazonCalendar {
 		});
 	}
 
+	static async insertEvent(minDate, line) {
+		const elements = line.split(',');
+
+		const startElements = elements[0].split(' ');
+		const startDateElements = startElements[0].split('/');
+		const start = new Date(`${startDateElements[2]}-${startDateElements[0]}-${startDateElements[1]}T${startElements[1]}Z`);
+		const end = new Date(start);
+		end.setHours(end.getHours() + 1);
+
+		if(start.getTime() <= minDate.getTime()) {
+			return;
+		}
+
+		const id = 'PrimeVideo-' + start;
+
+		const field = {
+			id: id,
+			title: 'PrimeVideo',
+			description: elements[12],
+			start,
+			end,
+			origin: ''
+		};
+
+		if((await Database.execQuery('SELECT id FROM calendar WHERE id = $1', [id])).rows.length === 0) {
+			const [query, values] = Database.buildInsertQuery('calendar', field);
+
+			await Database.execQuery(
+				query,
+				values
+			);
+		}
+	}
+
 	static async importAmazonPrimeVideoActivity() {
 		const minDate = (await Database.execQuery(
-				'SELECT MAX(start) as min FROM calendar WHERE title = $1', ['PrimeVideo']
-			)).rows[0].min;
+			'SELECT MAX(start) as min FROM calendar WHERE title = $1', ['PrimeVideo']
+		)).rows[0].min;
 		minDate.setHours(minDate.getHours() - 6); // Safety margin
 
 		const file = fs.readFileSync(FILENAME).toString();
@@ -31,41 +65,9 @@ export default class AmazonCalendar {
 				continue;
 			}
 
-			const elements = line.split(',');
-
-			const startElements = elements[0].split(' ');
-			const startDateElements = startElements[0].split('/');
-			const start = new Date(`${startDateElements[2]}-${startDateElements[0]}-${startDateElements[1]}T${startElements[1]}Z`);
-			const end = new Date(start);
-			end.setHours(end.getHours() + 1);
-
-			if(start.getTime() <= minDate.getTime()) {
-				continue;
-			}
-
-			const id = 'PrimeVideo-' + start;
-
-			const field = {
-				id: id,
-				title: 'PrimeVideo',
-				description: elements[12],
-				start,
-				end,
-				origin: ''
-			};
-
-			//console.log(field);
-
-			if((await Database.execQuery('SELECT id FROM calendar WHERE id = $1', [id])).rows.length === 0) {
-				const [query, values] = Database.buildInsertQuery('calendar', field);
-
-				await Database.execQuery(
-					query,
-					values
-				);
-			}
+			await AmazonCalendar.insertEvent(minDate, line);
 		}
 
 		log('Saved Amazon Activity', 'info');
 	}
-};
+}
