@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const FILENAME = path.join(process.cwd(), 'res/amazon/Digital.PrimeVideo.Viewinghistory.csv');
+const FILENAME = path.join(config['amazon']['folder'], 'Digital.PrimeVideo.Viewinghistory.csv');
 
 export default class AmazonCalendar {
 	static init() {
