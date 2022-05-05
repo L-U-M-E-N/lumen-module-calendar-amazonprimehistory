@@ -5,7 +5,7 @@ export default class AmazonCalendar {
 	static init() {
 		AmazonCalendar.importAmazonPrimeVideoActivity();
 
-		const watcher = fs.watch(path.join(config['amazon']['folder'], 'Digital.PrimeVideo.Viewinghistory.csv'), { persistent: false }, (curr, prev) => {
+		const watcher = fs.watch(path.join(config['folder'], 'Digital.PrimeVideo.Viewinghistory.csv'), { persistent: false }, (curr, prev) => {
 			watcher.close();
 
 			log('./reloading.STATS.AmazonPrime', 'boot');
@@ -54,7 +54,7 @@ export default class AmazonCalendar {
 		)).rows[0].min;
 		minDate.setHours(minDate.getHours() - 6); // Safety margin
 
-		const file = fs.readFileSync(path.join(config['amazon']['folder'], 'Digital.PrimeVideo.Viewinghistory.csv')).toString();
+		const file = fs.readFileSync(path.join(config['folder'], 'Digital.PrimeVideo.Viewinghistory.csv')).toString();
 
 		let firstLineSkipped = false;
 		for(const line of file.split('\n')) {
